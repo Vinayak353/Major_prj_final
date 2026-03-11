@@ -63,12 +63,12 @@ out/
 !.env.example
 
 ### Application Secrets ###
-application.properties
-application.yml
-application-local.properties
-application-local.yml
-application-dev.properties
-application-dev.yml
+# application.properties
+# application.yml
+# application-local.properties
+# application-local.yml
+# application-dev.properties
+# application-dev.yml
 
 ### OS Files ###
 .DS_Store
