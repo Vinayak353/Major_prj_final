@@ -29,10 +29,7 @@ build/
 .env
 .env.*
 !.env.example
-application-local.properties
-application-local.yml
-application-secret.properties
-application-secret.yml
+
 
 # ── IDEs ──────────────────────────────────────────────────────────────────────
 .idea/
