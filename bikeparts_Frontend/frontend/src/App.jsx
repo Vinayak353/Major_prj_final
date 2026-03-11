@@ -24,6 +24,7 @@ import AdminProducts  from './pages/admin/AdminProducts';
 import AdminOrders    from './pages/admin/AdminOrders';
 import AdminUsers     from './pages/admin/AdminUsers';
 
+import AdminMessages from './pages/admin/AdminMessages';
 import './styles/globals.css';
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
             <Route path="/admin/orders"   element={<AdminRoute><AdminOrders /></AdminRoute>} />
             <Route path="/admin/users"    element={<AdminRoute><AdminUsers /></AdminRoute>} />
 
+            <Route path="/admin/messages" element={<AdminMessages />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </CartProvider>

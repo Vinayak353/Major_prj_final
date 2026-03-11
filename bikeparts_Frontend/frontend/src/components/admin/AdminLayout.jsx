@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
-const NAV = [
-  { path: '/admin', label: 'Dashboard', icon: '📊' },
-  { path: '/admin/products', label: 'Products', icon: '⚙' },
-  { path: '/admin/orders', label: 'Orders', icon: '📦' },
-  { path: '/admin/users', label: 'Users', icon: '👥' },
-];
+import api from '../../services/api';
 
 const AdminLayout = ({ children, title, subtitle }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch unread message count for badge
+  useEffect(() => {
+    api.get('/admin/messages/unread-count')
+      .then(r => setUnreadCount(r.data?.count || 0))
+      .catch(() => {});
+  }, [location.pathname]); // refresh on nav
 
   const handleLogout = () => { logout(); navigate('/admin/login'); };
+
+  const NAV = [
+    { path: '/admin',          label: 'Dashboard', icon: '📊' },
+    { path: '/admin/products', label: 'Products',  icon: '⚙' },
+    { path: '/admin/orders',   label: 'Orders',    icon: '📦' },
+    { path: '/admin/users',    label: 'Users',     icon: '👥' },
+    { path: '/admin/messages', label: 'Messages',  icon: '✉', badge: unreadCount },
+  ];
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--black)' }}>
@@ -50,7 +60,18 @@ const AdminLayout = ({ children, title, subtitle }) => {
                 transition: 'all 0.15s',
               }}>
                 <span style={{ fontSize: '1.1rem' }}>{item.icon}</span>
-                {item.label}
+                <span style={{ flex: 1 }}>{item.label}</span>
+                {/* Unread badge */}
+                {item.badge > 0 && (
+                  <span style={{
+                    background: '#EF4444', color: '#fff',
+                    borderRadius: '999px', fontSize: '0.65rem',
+                    fontFamily: 'var(--font-mono)', fontWeight: 700,
+                    padding: '1px 7px', minWidth: 20, textAlign: 'center',
+                  }}>
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -70,7 +91,6 @@ const AdminLayout = ({ children, title, subtitle }) => {
 
       {/* Main content */}
       <main style={{ flex: 1, marginLeft: 240, overflow: 'auto' }}>
-        {/* Top bar */}
         <div style={{ background: 'var(--dark)', borderBottom: '1px solid var(--border)', padding: '20px 32px' }}>
           <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem' }}>{title}</h3>
           {subtitle && <p style={{ color: 'var(--muted)', marginTop: 4 }}>{subtitle}</p>}

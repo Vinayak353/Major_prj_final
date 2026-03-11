@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
+import api from '../../services/api';
 
 const Contact = () => {
-  const [form, setForm]   = useState({ name: '', email: '', subject: '', message: '' });
-  const [sent, setSent]   = useState(false);
+  const [form, setForm]     = useState({ name: '', email: '', subject: '', message: '' });
+  const [sent, setSent]     = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]   = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app this would call an API
-    setSent(true);
+    setError('');
+    setLoading(true);
+    try {
+      await api.post('/contact', form);
+      setSent(true);
+      setForm({ name: '', email: '', subject: '', message: '' });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to send message. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const INFO = [
@@ -43,10 +55,7 @@ const Contact = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 44 }}>
                 {INFO.map(({ icon, label, value }) => (
                   <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
-                    <div style={{
-                      width: 48, height: 48, background: 'var(--orange-glow)', border: '1px solid rgba(249,115,22,0.3)',
-                      borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0,
-                    }}>{icon}</div>
+                    <div style={{ width: 48, height: 48, background: 'var(--orange-glow)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0 }}>{icon}</div>
                     <div>
                       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>{label}</div>
                       <div style={{ color: 'var(--white)', fontSize: '1rem', fontWeight: 600 }}>{value}</div>
@@ -54,7 +63,6 @@ const Contact = () => {
                   </div>
                 ))}
               </div>
-
               <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '24px' }}>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--orange)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Response Time</div>
                 <p style={{ color: 'var(--muted)', fontSize: '0.95rem', lineHeight: 1.75 }}>
@@ -75,26 +83,44 @@ const Contact = () => {
               ) : (
                 <>
                   <h4 style={{ marginBottom: 28, fontFamily: 'var(--font-display)', fontSize: '1.8rem' }}>SEND A MESSAGE</h4>
+
+                  {error && (
+                    <div style={{ padding: '12px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius)', marginBottom: 20, color: '#F87171', fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}>
+                      ⚠ {error}
+                    </div>
+                  )}
+
                   <form onSubmit={handleSubmit}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                       <div className="form-group">
                         <label className="form-label">Your Name</label>
-                        <input className="form-control" placeholder="Rohan Sharma" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required />
+                        <input className="form-control" placeholder="Rohan Sharma" value={form.name}
+                          onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required />
                       </div>
                       <div className="form-group">
                         <label className="form-label">Email Address</label>
-                        <input type="email" className="form-control" placeholder="you@email.com" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required />
+                        <input type="email" className="form-control" placeholder="you@email.com" value={form.email}
+                          onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required />
                       </div>
                     </div>
                     <div className="form-group">
                       <label className="form-label">Subject</label>
-                      <input className="form-control" placeholder="Order issue, Part inquiry..." value={form.subject} onChange={e => setForm(p => ({ ...p, subject: e.target.value }))} required />
+                      <input className="form-control" placeholder="Order issue, Part inquiry..." value={form.subject}
+                        onChange={e => setForm(p => ({ ...p, subject: e.target.value }))} required />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Message</label>
-                      <textarea className="form-control" rows={5} placeholder="Describe your issue or question in detail..." value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} required style={{ resize: 'vertical', minHeight: 130 }} />
+                      <textarea className="form-control" rows={5}
+                        placeholder="Describe your issue or question in detail..."
+                        value={form.message}
+                        onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
+                        required style={{ resize: 'vertical', minHeight: 130 }} />
                     </div>
-                    <button type="submit" className="btn btn-primary btn-full" style={{ height: 52, fontSize: '1.05rem' }}>Send Message →</button>
+                    <button type="submit" className="btn btn-primary btn-full"
+                      style={{ height: 52, fontSize: '1.05rem', opacity: loading ? 0.7 : 1 }}
+                      disabled={loading}>
+                      {loading ? 'Sending…' : 'Send Message →'}
+                    </button>
                   </form>
                 </>
               )}
