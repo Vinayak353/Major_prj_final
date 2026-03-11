@@ -1,0 +1,54 @@
+# ── Java / Spring Boot ────────────────────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.pid
+spring-pid
+
+# ── Maven ─────────────────────────────────────────────────────────────────────
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ── Gradle (if applicable) ────────────────────────────────────────────────────
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ── Node / React ──────────────────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+.npm
+*.tsbuildinfo
+
+# ── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+application-local.properties
+application-local.yml
+application-secret.properties
+application-secret.yml
+
+# ── IDEs ──────────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.iws
+.vscode/
+*.swp
+*.swo
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+*.tmp
+*.bak
+*.orig
+logs/
