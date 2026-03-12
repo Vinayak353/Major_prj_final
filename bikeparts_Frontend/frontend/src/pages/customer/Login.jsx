@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import ToastContainer from '../../components/common/ToastContainer';
 import { useToast } from '../../utils/useToast';
@@ -8,6 +9,7 @@ const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,7 +50,6 @@ const Login = () => {
     <div style={{ minHeight: '100vh', background: 'var(--black)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <ToastContainer toasts={toasts} />
 
-      {/* Background grid */}
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none',
         backgroundImage: `linear-gradient(rgba(255,107,26,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,107,26,0.03) 1px, transparent 1px)`,
@@ -56,7 +57,6 @@ const Login = () => {
       }} />
 
       <div style={{ width: '100%', maxWidth: 440, position: 'relative', zIndex: 1 }}>
-        {/* Logo */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 40, textDecoration: 'none' }}>
           <div style={{ width: 32, height: 32, background: 'var(--orange)', clipPath: 'polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--black)' }}>⚙</span>
@@ -86,14 +86,20 @@ const Login = () => {
 
             <div className="form-group">
               <label className="form-label">Password</label>
-              <input
-                type="password" name="password"
-                className="form-control"
-                placeholder="Your password"
-                value={form.password}
-                onChange={handleChange}
-                style={{ borderColor: errors.password ? 'var(--danger)' : undefined }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'} name="password"
+                  className="form-control"
+                  placeholder="Your password"
+                  value={form.password}
+                  onChange={handleChange}
+                  style={{ borderColor: errors.password ? 'var(--danger)' : undefined, paddingRight: 42 }}
+                />
+                <button type="button" onClick={() => setShowPassword(prev => !prev)}
+                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '1rem', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
               {errors.password && <span style={{ color: 'var(--danger)', fontSize: '0.8rem' }}>{errors.password}</span>}
             </div>
 

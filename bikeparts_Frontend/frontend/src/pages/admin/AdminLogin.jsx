@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import ToastContainer from '../../components/common/ToastContainer';
 import { useToast } from '../../utils/useToast';
 
 const AdminLogin = () => {
-  const [form, setForm]       = useState({ email: '', password: '' });
-  const [loading, setLoading] = useState(false);
-  const { adminLogin }        = useAuth();
-  const navigate              = useNavigate();
-  const { toasts, error }     = useToast();
+  const [form, setForm]                 = useState({ email: '', password: '' });
+  const [loading, setLoading]           = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const { adminLogin }                  = useAuth();
+  const navigate                        = useNavigate();
+  const { toasts, error }               = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,8 +76,20 @@ const AdminLogin = () => {
             </div>
             <div className="form-group">
               <label className="form-label">Password</label>
-              <input type="password" className="form-control" placeholder="Admin password"
-                value={form.password} onChange={e => setForm(p => ({ ...p, password: e.target.value }))} required />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'} className="form-control"
+                  placeholder="Admin password"
+                  value={form.password}
+                  onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
+                  required
+                  style={{ paddingRight: 42 }}
+                />
+                <button type="button" onClick={() => setShowPassword(prev => !prev)}
+                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '1rem', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <button type="submit" className="btn btn-primary btn-full" disabled={loading} style={{ height: 48, marginTop: 8 }}>
               {loading ? <><div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} /> Authenticating...</> : 'ACCESS ADMIN PANEL'}

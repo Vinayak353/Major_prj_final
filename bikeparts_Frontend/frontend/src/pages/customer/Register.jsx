@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import ToastContainer from '../../components/common/ToastContainer';
 import { useToast } from '../../utils/useToast';
@@ -8,6 +9,7 @@ const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPasswords, setShowPasswords] = useState({ password: false, confirmPassword: false });
   const { register } = useAuth();
   const navigate = useNavigate();
   const { toasts, success, error } = useToast();
@@ -47,10 +49,10 @@ const Register = () => {
   };
 
   const fields = [
-    { name: 'name', label: 'Full Name', type: 'text', placeholder: 'John Doe' },
-    { name: 'email', label: 'Email Address', type: 'email', placeholder: 'you@example.com' },
-    { name: 'phone', label: 'Mobile Number', type: 'tel', placeholder: '9876543210' },
-    { name: 'password', label: 'Password', type: 'password', placeholder: 'Min. 8 characters' },
+    { name: 'name',            label: 'Full Name',        type: 'text',     placeholder: 'John Doe' },
+    { name: 'email',           label: 'Email Address',    type: 'email',    placeholder: 'you@example.com' },
+    { name: 'phone',           label: 'Mobile Number',    type: 'tel',      placeholder: '9876543210' },
+    { name: 'password',        label: 'Password',         type: 'password', placeholder: 'Min. 8 characters' },
     { name: 'confirmPassword', label: 'Confirm Password', type: 'password', placeholder: 'Repeat password' },
   ];
 
@@ -81,14 +83,24 @@ const Register = () => {
             {fields.map(f => (
               <div className="form-group" key={f.name}>
                 <label className="form-label">{f.label}</label>
-                <input
-                  type={f.type} name={f.name}
-                  className="form-control"
-                  placeholder={f.placeholder}
-                  value={form[f.name]}
-                  onChange={handleChange}
-                  style={{ borderColor: errors[f.name] ? 'var(--danger)' : undefined }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={f.type === 'password' ? (showPasswords[f.name] ? 'text' : 'password') : f.type}
+                    name={f.name}
+                    className="form-control"
+                    placeholder={f.placeholder}
+                    value={form[f.name]}
+                    onChange={handleChange}
+                    style={{ borderColor: errors[f.name] ? 'var(--danger)' : undefined, paddingRight: f.type === 'password' ? 42 : undefined }}
+                  />
+                  {f.type === 'password' && (
+                    <button type="button"
+                      onClick={() => setShowPasswords(prev => ({ ...prev, [f.name]: !prev[f.name] }))}
+                      style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '1rem', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}>
+                      {showPasswords[f.name] ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  )}
+                </div>
                 {errors[f.name] && <span style={{ color: 'var(--danger)', fontSize: '0.8rem' }}>{errors[f.name]}</span>}
               </div>
             ))}
