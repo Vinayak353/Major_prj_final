@@ -38,7 +38,7 @@ const BIKE_BRANDS = [
 const FEATURES = [
   { icon: '✓',  title: 'Genuine Parts Only',  desc: 'Sourced directly from authorized manufacturers and distributors. OEM quality guaranteed.' },
   { icon: '🚀', title: 'Fast Delivery',        desc: 'Same-day dispatch for orders before 2 PM. Delivered in 24–48 hours across India.' },
-  { icon: '🔒', title: 'Secure Payments',      desc: 'Cash on Delivery only.' },
+  { icon: '🔒', title: 'Secure Payments',      desc: 'Pay only when your order arrives at your doorstep. No online payment required — simple, secure, and convenient.' },
   { icon: '↩',  title: 'Easy Returns',         desc: '7-day hassle-free return policy. Full refund if the part doesn\'t fit your bike.' },
 ];
 
@@ -186,37 +186,32 @@ const Home = () => {
             <p style={{ color: 'var(--muted)', marginTop: 12 }}>Find parts compatible with your specific make and model</p>
           </div>
 
-          {/* ── 4 equal columns, 2 neat rows of 4 ── */}
+          {/* ── 4 equal columns, logo-only cards ── */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
             {BIKE_BRANDS.map(brand => (
               <Link key={brand.name} to={`/products?search=${encodeURIComponent(brand.name)}`} style={{ textDecoration: 'none', display: 'block' }}>
                 <div
                   style={{
                     background: 'var(--surface)', border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-lg)', padding: '36px 24px',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    textAlign: 'center', transition: 'all 0.25s', cursor: 'pointer',
-                    height: '100%', minHeight: 210,
+                    borderRadius: 'var(--radius-lg)', overflow: 'hidden',
+                    transition: 'all 0.25s', cursor: 'pointer',
+                    aspectRatio: '1',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: 24,
                   }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-orange)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
                 >
-                  <div style={{
-                    width: '100%', height: 72, borderRadius: '12px', marginBottom: 20,
-                    background: 'var(--surface2)', border: '1px dashed var(--border)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    overflow: 'hidden', flexShrink: 0, padding: '8px 14px',
-                  }}>
-                    {brand.img
-                      ? <img src={brand.img} alt={brand.name} style={{ maxWidth: '100%', maxHeight: 52, objectFit: 'contain' }}
-                          onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='block'; }}
-                        />
-                      : null
-                    }
-                    <span style={{ display: 'none', fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--orange)', letterSpacing: '0.08em' }}>{brand.name}</span>
-                  </div>
-                  <div style={{ fontFamily: 'var(--font-body)', fontWeight: 700, color: 'var(--white)', fontSize: '1.1rem', marginBottom: 6 }}>{brand.name}</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--muted)' }}>View Parts →</div>
+                  {brand.img ? (
+                    <img
+                      src={brand.img}
+                      alt={brand.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      onError={e => { e.target.style.display = 'none'; }}
+                    />
+                  ) : (
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--orange)', letterSpacing: '0.08em' }}>{brand.name}</span>
+                  )}
                 </div>
               </Link>
             ))}
@@ -261,7 +256,7 @@ const Home = () => {
           </div>
           <h2 style={{ marginBottom: 16 }}>FREE SHIPPING ON <span style={{ color: 'var(--orange)' }}>ALL ORDERS</span></h2>
           <p style={{ color: 'var(--muted)', fontSize: '1.1rem', marginBottom: 36, maxWidth: 480, margin: '0 auto 36px' }}>
-            No minimum order value. Delivery across India within 24–48 hours.
+             Delivery across India within 24–48 hours.
           </p>
           <Link to="/products" className="btn btn-primary btn-lg">Shop Now →</Link>
         </div>
@@ -293,32 +288,61 @@ const Home = () => {
       </section>
 
       {/* ── TESTIMONIALS ─────────────────────────────────────────── */}
-      <section className="section-sm" style={{ background: 'var(--dark)' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 44 }}>
-            <h2>WHAT RIDERS <span style={{ color: 'var(--orange)' }}>SAY</span></h2>
-            <span className="accent-line" style={{ margin: '12px auto' }} />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
-            {[
-              { name: 'Rohan Sharma',   bike: 'Royal Enfield Classic 350', text: 'Got my brake pads in less than a day. Genuine Brembo, perfect fit. Will order again!', rating: 5 },
-              { name: 'Priya Nair',     bike: 'Honda CB300R',              text: 'Amazing prices on K&N filters. The quality is exactly what I expected. Very happy.', rating: 5 },
-              { name: 'Arjun Mehta',    bike: 'KTM 390 Duke',              text: 'Chain kit arrived well-packaged. Installation was smooth. Highly recommend MotoParts.', rating: 5 },
-            ].map((t, i) => (
-              <div key={i} className="card" style={{ padding: '28px' }}>
-                <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
-                  {[...Array(t.rating)].map((_, j) => <span key={j} style={{ color: 'var(--warning)', fontSize: '1rem' }}>★</span>)}
-                </div>
-                <p style={{ color: 'var(--text)', fontSize: '1rem', lineHeight: 1.75, marginBottom: 20, fontStyle: 'italic' }}>"{t.text}"</p>
-                <div>
-                  <div style={{ color: 'var(--white)', fontWeight: 700, fontSize: '1rem' }}>{t.name}</div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--orange)', marginTop: 3 }}>{t.bike}</div>
-                </div>
-              </div>
-            ))}
+      {/* ── HOW IT WORKS ─────────────────────────────────────────── */}
+<section className="section-sm" style={{ background: 'var(--dark)' }}>
+  <div className="container">
+    <div style={{ textAlign: 'center', marginBottom: 44 }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--orange)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: 10 }}>Simple Process</div>
+      <h2>HOW IT <span style={{ color: 'var(--orange)' }}>WORKS</span></h2>
+      <span className="accent-line" style={{ margin: '12px auto' }} />
+      <p style={{ color: 'var(--muted)', marginTop: 12 }}>Get the right part at your door in 3 easy steps</p>
+    </div>
+
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10, position: 'relative' }}>
+      {[
+        { step: '01', icon: '🔍', title: 'Search Your Part',    desc: 'Search by part name, bike brand, or model. Our catalogue is organised to help you find the exact fit.' },
+        { step: '02', icon: '🛒', title: 'Place Your Order',    desc: 'Add to cart and confirm. No online payment needed — Cash on Delivery available across India.' },
+        { step: '03', icon: '📦', title: 'Receive & Ride',      desc: 'Your genuine part is dispatched same day and delivered within 24–48 hours. Install and hit the road.' },
+      ].map((item, i, arr) => (
+        <div key={i} style={{ position: 'relative' }}>
+          {/* Connector line between steps */}
+          {i < arr.length - 1 && (
+            <div style={{
+              position: 'absolute', top: 36, right: 0,
+              width: '50%', height: 1,
+              background: 'linear-gradient(to right, rgba(249,115,22,0.4), transparent)',
+              zIndex: 0,
+              display: window.innerWidth < 600 ? 'none' : 'block',
+            }} />
+          )}
+          <div className="card" style={{ padding: '36px 28px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--orange)',
+              letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 16,
+              opacity: 0.6,
+            }}>
+              STEP {item.step}
+            </div>
+            <div style={{
+              width: 64, height: 64, borderRadius: '16px', margin: '0 auto 20px',
+              background: 'var(--orange-glow)', border: '1px solid rgba(249,115,22,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.8rem',
+            }}>
+              {item.icon}
+            </div>
+            <h4 style={{ marginBottom: 12, fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: '1.1rem' }}>
+              {item.title}
+            </h4>
+            <p style={{ color: 'var(--muted)', fontSize: '0.95rem', lineHeight: 1.75 }}>
+              {item.desc}
+            </p>
           </div>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
 
       <Footer />
     </div>

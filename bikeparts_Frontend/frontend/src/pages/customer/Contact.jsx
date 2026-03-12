@@ -25,10 +25,10 @@ const Contact = () => {
   };
 
   const INFO = [
-    { icon: '📧', label: 'Email',   value: 'support@motoparts.in' },
-    { icon: '📞', label: 'Phone',   value: '+91 98765 43210' },
+    { icon: '📧', label: 'Email',   value: 'support@motoparts.com' },
+    { icon: '📞', label: 'Phone',   value: '+91 8087547750' },
     { icon: '🕐', label: 'Hours',   value: 'Mon–Sat, 9 AM – 7 PM IST' },
-    { icon: '📍', label: 'Address', value: 'Pune, Maharashtra, India' },
+    { icon: '📍', label: 'Address', value: 'Vinod Auto Parts, Near Market Yard Gate, Tuljapur Road, Sambhaji Nagar, Barshi-413401, Maharashtra' },
   ];
 
   return (
@@ -77,7 +77,7 @@ const Contact = () => {
                 <div style={{ textAlign: 'center', padding: '40px 0' }}>
                   <div style={{ fontSize: '3.5rem', marginBottom: 20 }}>✅</div>
                   <h3 style={{ marginBottom: 12 }}>Message Sent!</h3>
-                  <p style={{ color: 'var(--muted)' }}>We'll get back to you within 2–4 hours.</p>
+                  <p style={{ color: 'var(--muted)' }}>We'll get back to you within few hours.</p>
                   <button className="btn btn-outline" style={{ marginTop: 28 }} onClick={() => setSent(false)}>Send Another</button>
                 </div>
               ) : (

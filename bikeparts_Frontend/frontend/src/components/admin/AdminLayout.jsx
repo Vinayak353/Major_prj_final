@@ -16,7 +16,7 @@ const AdminLayout = ({ children, title, subtitle }) => {
       .catch(() => {});
   }, [location.pathname]); // refresh on nav
 
-  const handleLogout = () => { logout(); navigate('/admin/login'); };
+  const handleLogout = () => { logout(); navigate('/'); };
 
   const NAV = [
     { path: '/admin',          label: 'Dashboard', icon: '📊' },

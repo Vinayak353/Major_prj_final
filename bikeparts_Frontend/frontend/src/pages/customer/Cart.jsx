@@ -143,11 +143,11 @@ const Cart = () => {
                 </p>
               )}
 
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
+              {/* <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
                 {['UPI', 'VISA', 'Mastercard', 'Wallet'].map(p => (
                   <span key={p} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', padding: '4px 10px', border: '1px solid var(--border)', borderRadius: 3, color: 'var(--muted)' }}>{p}</span>
                 ))}
-              </div>
+              </div> */}
             </div>
 
           </div>

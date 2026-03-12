@@ -195,7 +195,7 @@ const AdminDashboard = () => {
         }
       </div>
 
-      {/* ── Charts Row ─────────────────────────────────────────────────────── */}
+      {/* ── Charts Row ───────────────────────────────────────────────────────
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 20, marginBottom: 28 }}>
         <div className="card" style={{ padding: '22px 24px' }}>
           <h4 style={{ marginBottom: 20, fontFamily: 'var(--font-display)', fontSize: '1rem', letterSpacing: '0.05em' }}>
@@ -215,7 +215,7 @@ const AdminDashboard = () => {
             : <BarChart data={statusChartData} color="#60A5FA" />
           }
         </div>
-      </div>
+      </div> */}
 
       {/* ── Recent Orders Table ─────────────────────────────────────────────── */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>

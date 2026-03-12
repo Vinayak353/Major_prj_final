@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../services/api';
 
 const STATUSES = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
@@ -48,7 +49,6 @@ const AdminOrders = () => {
     setUpdating(orderId);
     try {
       const res = await api.put(`/admin/orders/${orderId}/status`, { status: newStatus });
-      // Update in-place so UI doesn't flash
       setOrders(prev => prev.map(o => o.id === orderId ? res.data : o));
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to update status');
@@ -57,7 +57,6 @@ const AdminOrders = () => {
     }
   };
 
-  // Filter by status and search (order id or customer name/email)
   const filtered = orders.filter(o => {
     const matchStatus = filterStatus ? o.status === filterStatus : true;
     const q = searchText.toLowerCase();
@@ -69,7 +68,8 @@ const AdminOrders = () => {
   });
 
   return (
-    <div>
+    <AdminLayout title="ORDERS" subtitle="Manage and update customer orders">
+
       {/* Toolbar */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
         <input
@@ -123,20 +123,17 @@ const AdminOrders = () => {
                 onClick={() => setExpanded(expanded === order.id ? null : order.id)}
                 style={{ padding: '16px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}
               >
-                {/* Order ID */}
                 <div style={{ minWidth: 70 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Order</div>
                   <div style={{ fontWeight: 700, color: 'var(--white)' }}>#{order.id}</div>
                 </div>
 
-                {/* Customer */}
                 <div style={{ flex: 1, minWidth: 140 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Customer</div>
                   <div style={{ fontWeight: 600, color: 'var(--white)', fontSize: '0.9rem' }}>{order.user?.name || '—'}</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>{order.user?.email || ''}</div>
                 </div>
 
-                {/* Date */}
                 <div style={{ minWidth: 100 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Date</div>
                   <div style={{ color: 'var(--text)', fontSize: '0.85rem' }}>
@@ -144,13 +141,11 @@ const AdminOrders = () => {
                   </div>
                 </div>
 
-                {/* Items count */}
                 <div style={{ minWidth: 60, textAlign: 'center' }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Items</div>
                   <div style={{ fontWeight: 600, color: 'var(--text)' }}>{(order.items || []).length}</div>
                 </div>
 
-                {/* Total */}
                 <div style={{ minWidth: 110, textAlign: 'right' }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Total</div>
                   <div style={{ fontFamily: 'var(--font-display)', color: 'var(--orange)', fontWeight: 700 }}>
@@ -158,10 +153,8 @@ const AdminOrders = () => {
                   </div>
                 </div>
 
-                {/* Status badge */}
                 <Badge status={order.status} />
 
-                {/* Expand icon */}
                 <span style={{ color: 'var(--muted)', fontSize: '0.8rem', marginLeft: 'auto' }}>
                   {expanded === order.id ? '▲' : '▼'}
                 </span>
@@ -171,7 +164,6 @@ const AdminOrders = () => {
               {expanded === order.id && (
                 <div style={{ borderTop: '1px solid var(--border)', padding: '20px' }}>
 
-                  {/* Status change */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--muted)', textTransform: 'uppercase' }}>
                       Update Status:
@@ -201,7 +193,6 @@ const AdminOrders = () => {
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                    {/* Items list */}
                     <div>
                       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 8 }}>
                         Items
@@ -228,7 +219,6 @@ const AdminOrders = () => {
                       </div>
                     </div>
 
-                    {/* Shipping + order meta */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {order.shippingAddress && (
                         <div style={{ padding: '12px 14px', background: 'var(--surface)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
@@ -259,7 +249,7 @@ const AdminOrders = () => {
           ))}
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 };
 
