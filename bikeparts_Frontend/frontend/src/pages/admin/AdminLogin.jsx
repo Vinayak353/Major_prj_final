@@ -15,27 +15,19 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.email || !form.password) {
+      error('Please enter email and password.');
+      return;
+    }
     setLoading(true);
-    console.log('=== ADMIN LOGIN ATTEMPT ===');
-    console.log('Email:', form.email);
     try {
       const userObj = await adminLogin(form.email, form.password);
-      console.log('=== LOGIN RESPONSE userObj ===', userObj);
-      console.log('Role:', userObj?.role);
-      console.log('localStorage token:', localStorage.getItem('token'));
-      console.log('localStorage user:', localStorage.getItem('user'));
-
       if (!userObj || userObj.role !== 'ADMIN') {
-        console.log('FAILED role check — role was:', userObj?.role);
         error('Access denied. Admin account required.');
         return;
       }
-      console.log('SUCCESS — navigating to /admin');
       navigate('/admin', { replace: true });
     } catch (err) {
-      console.log('=== LOGIN ERROR ===', err);
-      console.log('Status:', err.response?.status);
-      console.log('Response data:', err.response?.data);
       error(err.response?.data?.message || 'Invalid credentials.');
     } finally {
       setLoading(false);
@@ -43,17 +35,9 @@ const AdminLogin = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh', background: 'var(--black)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24
-    }}>
+    <div style={{ minHeight: '100vh', background: 'var(--black)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <ToastContainer toasts={toasts} />
-      <div style={{
-        position: 'fixed', inset: 0, pointerEvents: 'none',
-        backgroundImage: `linear-gradient(rgba(255,107,26,0.03) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(255,107,26,0.03) 1px, transparent 1px)`,
-        backgroundSize: '60px 60px',
-      }} />
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', backgroundImage: `linear-gradient(rgba(255,107,26,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,107,26,0.03) 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
       <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', color: 'var(--white)', letterSpacing: '0.08em' }}>
@@ -68,11 +52,15 @@ const AdminLogin = () => {
             <div style={{ width: 3, height: 28, background: 'var(--orange)' }} />
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem' }}>ADMIN SIGN IN</h3>
           </div>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="form-group">
               <label className="form-label">Admin Email</label>
-              <input type="email" className="form-control" placeholder="admin@motoparts.in"
-                value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} required />
+              <input
+                type="email" className="form-control" placeholder="admin@motoparts.in"
+                autoComplete="new-password"
+                value={form.email}
+                onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+              />
             </div>
             <div className="form-group">
               <label className="form-label">Password</label>
@@ -80,12 +68,12 @@ const AdminLogin = () => {
                 <input
                   type={showPassword ? 'text' : 'password'} className="form-control"
                   placeholder="Admin password"
+                  autoComplete="new-password"
                   value={form.password}
                   onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-                  required
                   style={{ paddingRight: 42 }}
                 />
-                <button type="button" onClick={() => setShowPassword(prev => !prev)}
+                <button type="button" onClick={() => setShowPassword(p => !p)}
                   style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '1rem', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}>
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>

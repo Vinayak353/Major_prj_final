@@ -33,7 +33,7 @@ const Login = () => {
     try {
       const data = await login(form.email, form.password);
       success('Welcome back!');
-      setTimeout(() => navigate(data.user?.role === 'ADMIN' ? '/admin' : from, { replace: true }), 800);
+      setTimeout(() => navigate(data?.role === 'ADMIN' ? '/admin' : from, { replace: true }), 800);
     } catch (err) {
       error(err.response?.data?.message || 'Invalid credentials. Please try again.');
     } finally {
@@ -42,19 +42,16 @@ const Login = () => {
   };
 
   const handleChange = (e) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    if (errors[e.target.name]) setErrors(prev => ({ ...prev, [e.target.name]: '' }));
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--black)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <ToastContainer toasts={toasts} />
 
-      <div style={{
-        position: 'fixed', inset: 0, pointerEvents: 'none',
-        backgroundImage: `linear-gradient(rgba(255,107,26,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,107,26,0.03) 1px, transparent 1px)`,
-        backgroundSize: '60px 60px',
-      }} />
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', backgroundImage: `linear-gradient(rgba(255,107,26,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,107,26,0.03) 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
 
       <div style={{ width: '100%', maxWidth: 440, position: 'relative', zIndex: 1 }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 40, textDecoration: 'none' }}>
@@ -70,11 +67,20 @@ const Login = () => {
           <h3 style={{ marginBottom: 4, fontFamily: 'var(--font-display)', fontSize: '1.8rem' }}>SIGN IN</h3>
           <p style={{ color: 'var(--muted)', marginBottom: 32, fontSize: '0.9rem' }}>Welcome back. Enter your credentials.</p>
 
-          <form onSubmit={handleSubmit}>
+          {/*
+            autoComplete="off" on <form> is ignored by Chrome/Firefox by design.
+            The only reliable cross-browser fix is autoComplete="new-password" on
+            every field — browsers treat this as a "new password" context and skip
+            autofill entirely.
+          */}
+          <form onSubmit={handleSubmit} noValidate>
+
             <div className="form-group">
               <label className="form-label">Email Address</label>
               <input
-                type="email" name="email"
+                type="email"
+                name="email"
+                autoComplete="new-password"
                 className="form-control"
                 placeholder="you@example.com"
                 value={form.email}
@@ -88,7 +94,9 @@ const Login = () => {
               <label className="form-label">Password</label>
               <div style={{ position: 'relative' }}>
                 <input
-                  type={showPassword ? 'text' : 'password'} name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  autoComplete="new-password"
                   className="form-control"
                   placeholder="Your password"
                   value={form.password}

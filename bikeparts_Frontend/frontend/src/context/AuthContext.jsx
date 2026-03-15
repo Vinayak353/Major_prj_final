@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On app load, restore user from localStorage
   useEffect(() => {
     const token = localStorage.getItem('token');
     const stored = localStorage.getItem('user');
@@ -21,14 +20,18 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Save user to state + localStorage from the API response { token, user: {...} }
   const saveUser = (data) => {
-    const u = data.user || data; // support both nested { token, user } and flat responses
+    const u = data.user || data;
     const userObj = {
-      id:    u.id    || null,
-      name:  u.name  || '',
-      email: u.email || '',
-      role:  u.role  || 'CUSTOMER',
+      id:      u.id      || null,
+      name:    u.name    || '',
+      email:   u.email   || '',
+      role:    u.role    || 'CUSTOMER',
+      phone:   u.phone   || '',
+      address: u.address || '',
+      city:    u.city    || '',
+      state:   u.state   || '',
+      pincode: u.pincode || '',
     };
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(userObj));
@@ -36,34 +39,39 @@ export const AuthProvider = ({ children }) => {
     return userObj;
   };
 
+  // Merges updated fields into current user — updates both React state and localStorage
+  const updateUser = (updatedFields) => {
+    const merged = { ...user, ...updatedFields };
+    localStorage.setItem('user', JSON.stringify(merged));
+    setUser(merged);
+  };
+
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
-    const userObj = saveUser(data);
-    return userObj;           // return the userObj directly so callers can read role immediately
+    return saveUser(data);
   };
 
   const adminLogin = async (email, password) => {
     const { data } = await api.post('/auth/admin/login', { email, password });
-    const userObj = saveUser(data);
-    return userObj;
+    return saveUser(data);
   };
 
   const register = async (formData) => {
     const { data } = await api.post('/auth/register', formData);
-    const userObj = saveUser(data);
-    return userObj;
+    return saveUser(data);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
+    window.history.replaceState(null, '', '/');
   };
 
   const isAdmin = () => user?.role === 'ADMIN';
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, adminLogin, register, logout, isAdmin }}>
+    <AuthContext.Provider value={{ user, loading, login, adminLogin, register, logout, updateUser, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

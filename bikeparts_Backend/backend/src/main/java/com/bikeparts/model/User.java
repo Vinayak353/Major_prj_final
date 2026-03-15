@@ -41,6 +41,15 @@ public class User implements UserDetails {
     @Pattern(regexp = "^[6-9]\\d{9}$")
     private String phone;
 
+    private String address;
+
+    private String city;
+
+    private String state;
+
+    @Column(name = "pincode")
+    private String pincode;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default

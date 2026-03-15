@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/common/Navbar';
 import Footer from '../../components/common/Footer';
@@ -13,19 +13,26 @@ const Cart = () => {
   const { items, updateQuantity, removeFromCart, getTotal, clearCart } = useCart();
   const { user }   = useAuth();
   const navigate   = useNavigate();
-  const { toasts, success } = useToast();
+  const { toasts, success, error: showError } = useToast();
+
+  // per-item raw text while typing
+  const [qtyInput, setQtyInput] = useState({});
 
   const subtotal = getTotal();
-  const tax      = subtotal * GST_RATE;
-  const total    = subtotal + tax;
+  const tax   = subtotal * GST_RATE;
+  const total = subtotal + tax;
 
   const handleCheckout = () => {
-    if (!user) {
-      // Redirect to login, then come back to checkout
-      navigate('/login', { state: { from: { pathname: '/checkout' } } });
-    } else {
-      navigate('/checkout');
-    }
+    if (!user) navigate('/login', { state: { from: { pathname: '/checkout' } } });
+    else navigate('/checkout');
+  };
+
+  const commitQty = (item, raw) => {
+    const val = parseInt(String(raw).trim(), 10);
+    setQtyInput(p => { const n = { ...p }; delete n[item.id]; return n; });
+    if (isNaN(val) || val <= 0) { removeFromCart(item.id); success('Item removed'); return; }
+    if (val > item.stock) { showError(`Only ${item.stock} units available for "${item.name}"`); return; }
+    updateQuantity(item.id, val);
   };
 
   if (items.length === 0) return (
@@ -48,8 +55,6 @@ const Cart = () => {
       <Navbar />
       <ToastContainer toasts={toasts} />
       <div style={{ paddingTop: 68 }}>
-
-        {/* Header */}
         <div style={{ background: 'var(--dark)', borderBottom: '1px solid var(--border)', padding: '28px 0' }}>
           <div className="container">
             <h2>SHOPPING <span style={{ color: 'var(--orange)' }}>CART</span></h2>
@@ -60,42 +65,67 @@ const Cart = () => {
         <div className="container" style={{ padding: '44px 28px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 36, alignItems: 'start' }}>
 
-            {/* Cart Items */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {items.map(item => (
-                <div key={item.id} className="card" style={{ padding: '20px', display: 'flex', gap: 20, alignItems: 'center' }}>
-                  <div style={{
-                    width: 84, height: 84, flexShrink: 0,
-                    background: 'var(--surface2)', borderRadius: 'var(--radius)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '2.2rem', color: 'var(--border)',
-                  }}>
-                    {item.imageUrl ? <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius)' }} /> : '⚙'}
-                  </div>
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--orange)', marginBottom: 4 }}>{item.brand}</div>
-                    <Link to={`/products/${item.id}`} style={{ fontWeight: 700, color: 'var(--white)', fontSize: '1.05rem', textDecoration: 'none' }}>{item.name}</Link>
-                    {item.modelCompatibility && <div style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: 4 }}>{item.modelCompatibility}</div>}
-                  </div>
-
-                  <div className="qty-input">
-                    <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)}>−</button>
-                    <span className="qty-value">{item.quantity}</span>
-                    <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
-                  </div>
-
-                  <div style={{ textAlign: 'right', minWidth: 110 }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--white)' }}>
-                      ₹{(Number(item.price) * item.quantity).toLocaleString('en-IN')}
+              {items.map(item => {
+                const rawVal = qtyInput[item.id] !== undefined ? qtyInput[item.id] : String(item.quantity);
+                return (
+                  <div key={item.id} className="card" style={{ padding: '20px', display: 'flex', gap: 20, alignItems: 'center' }}>
+                    <div style={{ width: 84, height: 84, flexShrink: 0, background: 'var(--surface2)', borderRadius: 'var(--radius)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.2rem', color: 'var(--border)', overflow: 'hidden' }}>
+                      {item.imageUrl ? <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius)' }} /> : '⚙'}
                     </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--muted)' }}>₹{Number(item.price).toLocaleString('en-IN')} each</div>
-                  </div>
 
-                  <button onClick={() => { removeFromCart(item.id); success('Item removed'); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', fontSize: '1.2rem', padding: 8 }}>✕</button>
-                </div>
-              ))}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--orange)', marginBottom: 4 }}>{item.brand}</div>
+                      <Link to={`/products/${item.id}`} style={{ fontWeight: 700, color: 'var(--white)', fontSize: '1.05rem', textDecoration: 'none' }}>{item.name}</Link>
+                      {item.modelCompatibility && <div style={{ color: 'var(--muted)', fontSize: '0.9rem', marginTop: 4 }}>{item.modelCompatibility}</div>}
+                      <div style={{ fontSize: '0.75rem', marginTop: 4, color: item.stock <= 5 ? '#f59e0b' : 'var(--muted)' }}>
+                        {item.stock === 0 ? '⚠ Out of stock' : item.stock <= 5 ? `⚠ Only ${item.stock} left` : `${item.stock} in stock`}
+                      </div>
+                    </div>
+
+                    {/* Quantity: − input(number) + */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
+                      <button
+                        onClick={() => {
+                          if (item.quantity <= 1) { removeFromCart(item.id); success('Item removed'); }
+                          else updateQuantity(item.id, item.quantity - 1);
+                          setQtyInput(p => { const n = { ...p }; delete n[item.id]; return n; });
+                        }}
+                        style={{ width: 36, height: 40, background: 'var(--surface2)', border: 'none', cursor: 'pointer', color: 'var(--white)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid var(--border)' }}
+                      >−</button>
+
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={rawVal}
+                        onChange={e => { if (/^\d*$/.test(e.target.value)) setQtyInput(p => ({ ...p, [item.id]: e.target.value })); }}
+                        onBlur={e => commitQty(item, e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') e.target.blur(); }}
+                        style={{ width: 52, height: 40, textAlign: 'center', background: 'var(--surface)', border: 'none', color: 'var(--white)', fontSize: '0.95rem', fontFamily: 'var(--font-mono)', outline: 'none' }}
+                      />
+
+                      <button
+                        onClick={() => {
+                          if (item.quantity >= item.stock) { showError(`Only ${item.stock} units available`); return; }
+                          updateQuantity(item.id, item.quantity + 1);
+                          setQtyInput(p => { const n = { ...p }; delete n[item.id]; return n; });
+                        }}
+                        style={{ width: 36, height: 40, background: 'var(--surface2)', border: 'none', cursor: 'pointer', color: 'var(--white)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderLeft: '1px solid var(--border)' }}
+                      >+</button>
+                    </div>
+
+                    <div style={{ textAlign: 'right', minWidth: 110 }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--white)' }}>
+                        ₹{(Number(item.price) * item.quantity).toLocaleString('en-IN')}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--muted)' }}>₹{Number(item.price).toLocaleString('en-IN')} each</div>
+                    </div>
+
+                    <button onClick={() => { removeFromCart(item.id); success('Item removed'); }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', fontSize: '1.2rem', padding: 8 }}>✕</button>
+                  </div>
+                );
+              })}
 
               <div style={{ display: 'flex', gap: 12 }}>
                 <Link to="/products" className="btn btn-ghost btn-sm">← Continue Shopping</Link>
@@ -106,34 +136,26 @@ const Cart = () => {
             {/* Summary */}
             <div className="card" style={{ padding: 32, position: 'sticky', top: 88 }}>
               <h4 style={{ marginBottom: 28, fontFamily: 'var(--font-display)', fontSize: '1.6rem' }}>ORDER SUMMARY</h4>
-
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
-                {[
-                  ['Subtotal', `₹${subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`],
+                {[['Subtotal', `₹${subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`],
                   [`GST (18%)`, `₹${tax.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`],
-                  ['Shipping', 'FREE'],
-                ].map(([label, val]) => (
+                  ['Shipping', 'FREE']].map(([label, val]) => (
                   <div key={label} style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--muted)', fontSize: '1rem' }}>{label}</span>
                     <span style={{ color: label === 'Shipping' ? 'var(--success)' : 'var(--text)', fontWeight: 600, fontSize: '1rem' }}>{val}</span>
                   </div>
                 ))}
               </div>
-
               <hr className="divider" />
-
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 28 }}>
                 <span style={{ fontWeight: 700, color: 'var(--white)', fontSize: '1.1rem' }}>Total</span>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', color: 'var(--orange)' }}>
                   ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
-
               <button className="btn btn-primary btn-full" onClick={handleCheckout} style={{ fontSize: '1.05rem', height: 52 }}>
                 {user ? 'Proceed to Checkout →' : 'Login to Checkout →'}
               </button>
-
-              {/* Show login nudge if not logged in */}
               {!user && (
                 <p style={{ textAlign: 'center', marginTop: 14, fontSize: '0.9rem', color: 'var(--muted)' }}>
                   <Link to="/login" state={{ from: { pathname: '/checkout' } }} style={{ color: 'var(--orange)' }}>Sign in</Link>
@@ -142,14 +164,7 @@ const Cart = () => {
                   {' '}to place your order
                 </p>
               )}
-
-              {/* <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
-                {['UPI', 'VISA', 'Mastercard', 'Wallet'].map(p => (
-                  <span key={p} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', padding: '4px 10px', border: '1px solid var(--border)', borderRadius: 3, color: 'var(--muted)' }}>{p}</span>
-                ))}
-              </div> */}
             </div>
-
           </div>
         </div>
       </div>

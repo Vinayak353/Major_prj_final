@@ -38,6 +38,10 @@ public class AuthController {
                 .email(req.email())
                 .phone(req.phone())
                 .password(passwordEncoder.encode(req.password()))
+                .address(req.address())
+                .city(req.city())
+                .state(req.state())
+                .pincode(req.pincode())
                 .role(User.Role.CUSTOMER)
                 .build();
 
@@ -75,19 +79,25 @@ public class AuthController {
     }
 
     private UserDto toDto(User u) {
-        return new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhone(), u.getRole().name());
+        return new UserDto(u.getId(), u.getName(), u.getEmail(), u.getPhone(), u.getRole().name(),
+                u.getAddress(), u.getCity(), u.getState(), u.getPincode());
     }
 
     // ── DTOs ─────────────────────────────────────────────────────────────────
     public record RegisterRequest(
-        @NotBlank String name,
-        @Email @NotBlank String email,
-        @Pattern(regexp = "^[6-9]\\d{9}$", message = "Invalid phone number") String phone,
-        @Size(min = 8, message = "Password must be at least 8 characters") String password
+            @NotBlank String name,
+            @Email @NotBlank String email,
+            @Pattern(regexp = "^[6-9]\\d{9}$", message = "Invalid phone number") String phone,
+            @Size(min = 8, message = "Password must be at least 8 characters") String password,
+            String address,
+            String city,
+            String state,
+            String pincode
     ) {}
 
     public record LoginRequest(@Email @NotBlank String email, @NotBlank String password) {}
     public record AuthResponse(String token, UserDto user) {}
-    public record UserDto(Long id, String name, String email, String phone, String role) {}
+    public record UserDto(Long id, String name, String email, String phone, String role,
+                          String address, String city, String state, String pincode) {}
     public record ErrorBody(String message) {}
 }

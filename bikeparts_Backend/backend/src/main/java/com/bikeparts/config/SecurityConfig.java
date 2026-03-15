@@ -47,6 +47,7 @@ public class SecurityConfig {
                         // Authenticated endpoints
                         .requestMatchers("/api/orders/**").authenticated()
                         .requestMatchers("/api/payments/**").authenticated()
+                        .requestMatchers("/api/users/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
